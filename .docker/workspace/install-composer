@@ -1,0 +1,47 @@
+#!/bin/bash
+
+# Temporary files go in the temporary directory!
+cd /tmp
+
+# Get the installer
+php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+
+# Check that the file is actualy what it is supposes to be (although a MITM that
+# could impersonate goetcompoer.org and composer.github.com would still be able
+# to forge this, so the security here is not guaranteed...)
+ACTUAL_SIGNATURE="$(php -r "echo hash_file('sha384', 'composer-setup.php');")"
+EXPECTED_SIGNATURE="$(curl -s -o- https://composer.github.io/installer.sig)"
+if [ "$EXPECTED_SIGNATURE" != "$ACTUAL_SIGNATURE" ]; then
+    echo 'ERROR: Invalid installer signature' >&2
+
+    # Remove the temporary file
+    rm composer-setup.php
+
+    # Signal the error back to the caller
+    exit 1
+fi
+
+# The installer is authentic! Lets run it
+php composer-setup.php
+RESULT=$?
+
+if [ "$RESULT" != 0 ]; then
+    # On unsuccessfull installation, remove the temporary file and exit with the
+    # exit code of the installer
+    rm composer-setup.php
+    exit $RESULT
+fi
+
+# Move the composer executable to a global bin directory
+mv composer.phar /usr/local/bin/composer
+
+# Install autocomplete
+URL_PREFIX="https://raw.githubusercontent.com/sjorek/composer-bash-completion/master/"
+curl -s "$URL_PREFIX"/composer-completion.php > ~/.composer-completion.php
+curl -s "$URL_PREFIX"/composer-completion.bash > /usr/share/bash-completion/completions/composer
+
+(
+    echo
+    echo '# composer autocomplete'
+    echo 'export COMPOSER_COMPLETION_PHP_SCRIPT=~/.composer-completion.php'
+) >> ~/.bashrc

@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+# Fix for host.docker.internal not existing on linux
+# (see https://github.com/docker/for-linux/issues/264
+# and https://dev.to/bufferings/access-host-from-a-docker-container-4099)
+
+HOST_DOMAIN="host.docker.internal"
+
+# Check if the host exists
+# see https://stackoverflow.com/a/24049165/413531
+if dig ${HOST_DOMAIN} | grep -q 'NXDOMAIN'; then
+    # Add the hostname to the /etc/hosts file
+    HOST_IP="$(ip route list match 0/0 | awk '{ print $3 }')"
+    echo "$HOST_IP $HOST_DOMAIN" >> /etc/hosts
+fi
+
+exec "$@"

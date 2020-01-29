@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+timezone="$1"
+
+ln -snf /usr/share/zoneinfo/"$timezone" /etc/localtime
+echo "$timezone" > /etc/timezone

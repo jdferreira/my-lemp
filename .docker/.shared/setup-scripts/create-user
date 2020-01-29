@@ -1,0 +1,95 @@
+#!/usr/bin/env bash
+
+# ------------------------------- #
+# Name the command line arguments #
+# ------------------------------- #
+
+USER="$1"
+GROUP="$2"
+USER_ID="$3"
+GROUP_ID="$4"
+
+# ------------------------- #
+# Define auxiliary routines #
+# ------------------------- #
+
+error() {
+    echo "ERROR: $1. Aborting" >&2
+    exit 1
+}
+
+group-exists() {
+    getent group "$1" >/dev/null 2>/dev/null
+}
+
+user-exists() {
+    id "$1" >/dev/null 2>/dev/null
+}
+
+setup-group() {
+    if group-exists "$GROUP_ID"; then
+        error "Group with id $GROUP_ID already exists"
+    elif group-exists "$GROUP"; then
+        OLD_GROUP_ID="$(getent group "$GROUP" | cut -d: -f3)"
+        # If the requested group name already existed, we must convert it's old
+        # id to the new one, and change group permissions to reflect this change
+        groupmod -g "$GROUP_ID" "$GROUP"
+        find / -group "$OLD_GROUP_ID" -print0 2>/dev/null |
+            xargs -r -0 chgrp -h "$GROUP_ID"
+    else
+        # Add the group with the requested id
+        groupadd "$GROUP" -g "$GROUP_ID"
+    fi
+}
+
+setup-user() {
+    if user-exists "$USER" && user-exists "$USER_ID"; then
+        if [ $(id -u "$USER") = "$USER_ID" ]; then
+            # We are asked to create what already exists, which is a no-op
+            return
+        fi
+    fi
+
+    if user-exists "$USER_ID"; then
+        error "User with id $USER_ID already exists"
+    fi
+
+    # Right now, we know that a user with id $USER_ID does *not* exist. So we
+    # need to create it. But we still need to act differently according to
+    # whether the name already exists or not.
+
+    # Ensure a home directory exists and has the right permissions
+    HOME="/home/$USER"
+    mkdir -p "$HOME"
+    chown "$USER_ID:$GROUP_ID" "$HOME"
+    chmod 0755 "$HOME"
+
+    if user-exists "$USER"; then
+        OLD_USER_ID="$(id -u "$USER")"
+
+        # Modify this user's id, group id, home and shell login
+        usermod "$USER" \
+            -u "$USER_ID" \
+            -g "$GROUP_ID" \
+            -d "$HOME" \
+            -s "$(which bash)"
+
+        # Move ownership of files to the new user id
+        find / -user "$OLD_USER_ID" -print0 2>/dev/null |
+            xargs -r -0 chown -h "$USER"
+    else
+        # Create a user with the required id, group id, home and shell login
+        useradd "$USER" \
+            -u "$USER_ID" \
+            -g "$GROUP_ID" \
+            -d "$HOME" \
+            -s "$(which bash)"
+    fi
+}
+
+# ------------------------------ #
+# The entry point of this script #
+# ------------------------------ #
+
+setup-group
+setup-user

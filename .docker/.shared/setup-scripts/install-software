@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+apt-get update -qq
+
+apt-get upgrade -yqq \
+    curl \
+    dnsutils \
+    iproute2 \
+    iputils-ping \
+    sudo

@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+if [ "$1" = "-s" ]; then
+    SEP="$2"
+    shift 2
+else
+    SEP="#"
+fi
+
+OLD="$1"
+NEW="$2"
+shift 2
+
+while [ -n "$1" ]; do
+    sed -i "s${SEP}${OLD}${SEP}${NEW}${SEP}g" "$1"
+    shift
+done

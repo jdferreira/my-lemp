@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+# Download script to easily install PHP extensions
+# See https://github.com/mlocati/docker-php-extension-installer/
+curl -s https://raw.githubusercontent.com/mlocati/docker-php-extension-installer/master/install-php-extensions \
+    > /usr/local/bin/install-php-extensions
+
+chmod uga+x /usr/local/bin/install-php-extensions
+
+# Install extensions
+install-php-extensions \
+    opcache \
+    xdebug \
+    pdo pdo_mysql \
+>/dev/null
