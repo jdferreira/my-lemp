@@ -1,30 +1,47 @@
 #!/usr/bin/env bash
 
+# Where the .docker directory should go
 TARGET="$(pwd)"
-TMP="$(mktemp -d)"
+
+# Where to place the test.php and test-db.php files
 PUBLIC_DIR="${1:-.}"
 
+# We need let the nginx container know where the public directory is, by
+# changing the .docker/.env file. Here we detect where that directory is, based
+# on the user input. Notice that  the .docker/.env is one directory down from
+# the directory of the project, which means that relative paths must be
+# prepended with `..` to go back a level. Finally, if the public directory is
+# the same as the project, adjust the path from `../.` to `..`.
 if [[ "$PUBLIC_DIR" != /* ]]; then
-    HOST_APP_PATH="../$PUBLIC_DIR"
+    if [ "$PUBLIC_DIR" != "." ]; then
+        HOST_APP_PATH="../$PUBLIC_DIR"
+    fi
     PUBLIC_DIR="$TARGET/$PUBLIC_DIR"
 else
     HOST_APP_PATH="$PUBLIC_DIR"
 fi
 
+# Clone the repository to a temporary location
+TMP="$(mktemp -d)"
 cd "$TMP"
 git clone "https://github.com/jdferreira/my-lemp"
 cd "my-lemp"
 
+# Copy the necessary files. This includes the full .docker directory, the
+# test.php and test-db.php files, and the Makefile
 cp -r .docker "$TARGET/.docker"
+cp test.php test-db.php "$PUBLIC_DIR"
 
+# If the project already has a Makefile, do not replace it, but append the
+# docker recipes
 if [ -f "$TARGET/Makefile" ]; then
     (echo; cat Makefile.appendable) >> "$TARGET/Makefile"
 else
     cp Makefile "$TARGET"
 fi
 
-cp test.php test-db.php "$PUBLIC_DIR"
-
+# Back in the project directory, create the .docker/.env file with the correct
+# HOST_APP_PATH
 cd "$TARGET"
 make docker-init
 sed -i -r "s#HOST_APP_PATH=.*#HOST_APP_PATH=$HOST_APP_PATH#" .docker/.env
