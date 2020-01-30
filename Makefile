@@ -26,7 +26,7 @@ docker-init: $(DOCKER_COMPOSE_DIR)/.env ## Ensure the .env file exists and repla
 	mkdir -p $(DOCKER_COMPOSE_DIR)/db/data
 
 .PHONY: docker-build
-docker-build: init ## Build all containers. To build a specific container, use CONTAINER=<service>
+docker-build: docker-init ## Build all containers. To build a specific container, use CONTAINER=<service>
 	$(DOCKER_COMPOSE) build --parallel $(CONTAINER) && \
 	$(DOCKER_COMPOSE) up -d --force-recreate $(CONTAINER)
 
