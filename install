@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+TARGET="$(pwd)"
+TMP="$(mktemp -d)"
+PUBLIC_DIR="${1:-.}"
+
+if [[ "$PUBLIC_DIR" != /* ]]; then
+    HOST_APP_PATH="../$PUBLIC_DIR"
+    PUBLIC_DIR="$TARGET/$PUBLIC_DIR"
+else
+    HOST_APP_PATH="$PUBLIC_DIR"
+fi
+
+cd "$TMP"
+git clone "https://github.com/jdferreira/my-lemp"
+cd "my-lemp"
+
+cp -r .docker "$TARGET/.docker"
+
+if [ -f "$TARGET/Makefile" ]; then
+    (echo; cat Makefile.appendable) >> "$TARGET/Makefile"
+else
+    cp Makefile "$TARGET"
+fi
+
+cp test.php test-db.php "$PUBLIC_DIR"
+
+cd "$TARGET"
+make docker-init
+sed -i -r "s#HOST_APP_PATH=.*#HOST_APP_PATH=$HOST_APP_PATH#" .docker/.env
+

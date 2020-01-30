@@ -13,3 +13,15 @@ directory) that is accessible to the `nginx`, `php-fpm` and `workspace`
 containers.
 
 
+## Install
+
+If you want to install this in your project, you can
+
+```bash
+$ cd /path/to/project
+$ curl -s -o /tmp/install https://raw.githubusercontent.com/jdferreira/my-lemp/master/install
+$ chmod u+x /tmp/install
+$ /tmp/install <public>
+```
+
+where `<public>` is the directory containing the publicly available files of your application.
