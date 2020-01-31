@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Abort on errors
+set -e
+
 # Where the .docker directory should go
 TARGET="$(pwd)"
 
@@ -8,7 +11,7 @@ PUBLIC_DIR="${1:-.}"
 
 # Clone the repository to a temporary location
 TMP="$(mktemp -d)"
-(cd "$TMP"; git clone "https://github.com/jdferreira/my-lemp")
+(cd "$TMP"; git clone "https://github.com/jdferreira/my-lemp" "$TMP")
 
 # Copy the necessary files. This includes the full .docker directory, the
 # test.php and test-db.php files, and the Makefile
