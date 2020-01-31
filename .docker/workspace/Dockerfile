@@ -19,7 +19,7 @@ RUN /root/setup-scripts/install-software
 RUN /root/setup-scripts/install-php-extensions
 
 # Install additional utilities
-RUN apt-get update -qq && apt-get upgrade -yqq git htop vim
+RUN apt-get update -qq && apt-get upgrade -yqq git htop vim unzip >/dev/null
 
 # PHP and PHP-FPM configuration
 COPY .shared/config/php/conf.d/* /usr/local/etc/php/conf.d/
