@@ -23,6 +23,7 @@ $(DOCKER_COMPOSE_DIR)/.env:
 
 .PHONY: docker-init
 docker-init: $(DOCKER_COMPOSE_DIR)/.env ## Ensure the .env file exists and replace environment-specific variables.
+	ssh-keygen -t rsa -b 4096 -f $(DOCKER_COMPOSE_DIR)/workspace/.ssh/id_rsa -N "$$(grep SSH_PASSPHRASE $(DOCKER_COMPOSE_DIR)/.env | sed -E 's/SSH_PASSPHRASE\s*=\s*//')"
 	mkdir -p $(DOCKER_COMPOSE_DIR)/db/data
 
 .PHONY: docker-build

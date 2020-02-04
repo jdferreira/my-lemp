@@ -26,8 +26,5 @@ else
     cp "$TMP/Makefile" "$TARGET"
 fi
 
-# Create an SSH key
-ssh-keygen -t rsa -b 4096 -f .docker/workspace/.ssh/id_rsa -N secret
-
 # Create the .docker/.env file
 make docker-init
