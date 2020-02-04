@@ -1,2 +1,4 @@
 .env
 db/data/*
+workspace/.ssh/id_rsa
+workspace/.ssh/id_rsa.pub
