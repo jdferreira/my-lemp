@@ -30,10 +30,10 @@ RUN \
     apt-get upgrade -yqq openssh-server >/dev/null && \
     mkdir /var/run/sshd
 USER www-data
-COPY workspace/.ssh/insecure_id_rsa.pub /tmp/insecure_id_rsa.pub
+COPY workspace/.ssh/id_rsa.pub /tmp/id_rsa.pub
 RUN \
     mkdir -p ~/.ssh && \
-    cat /tmp/insecure_id_rsa.pub >> ~/.ssh/authorized_keys && \
+    cat /tmp/id_rsa.pub >> ~/.ssh/authorized_keys && \
     chown -R www-data: ~/.ssh && \
     chmod 0700 ~/.ssh && \
     chmod 0600 ~/.ssh/authorized_keys
