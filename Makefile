@@ -17,7 +17,7 @@ $(DOCKER_COMPOSE_DIR)/.env:
 		-e 's/__GID__/'"$$(getent group $$(groups | cut -d' ' -f1) | cut -d':' -f3)"'/' \
 		$(DOCKER_COMPOSE_DIR)/.env
 	awk \
-		-v rng="tr -dc '[:xdigit:]' </dev/urandom | fold -w 16" \
+		-v rng="tr -dc '[:alpha:][:digit:]/+_@!' </dev/urandom | fold -w 16" \
 		'/__PASSWORD__/ { rng | getline r; gsub("__PASSWORD__", r); } /.*/' \
 		$(DOCKER_COMPOSE_DIR)/.env > /tmp/env && mv /tmp/env $(DOCKER_COMPOSE_DIR)/.env
 
