@@ -17,9 +17,11 @@ $(DOCKER_COMPOSE_DIR)/.env:
 		'/__PASSWORD__/ { rng | getline r; gsub("__PASSWORD__", r); } /.*/' \
 		$(DOCKER_COMPOSE_DIR)/.env > /tmp/env && mv /tmp/env $(DOCKER_COMPOSE_DIR)/.env
 
-.PHONY: docker-init
-docker-init: $(DOCKER_COMPOSE_DIR)/.env ## Ensure the .env file exists and replace environment-specific variables.
+$(DOCKER_COMPOSE_DIR)/workspace/.ssh/id_rsa:
 	ssh-keygen -t rsa -b 4096 -f $(DOCKER_COMPOSE_DIR)/workspace/.ssh/id_rsa -N "$$(grep SSH_PASSPHRASE $(DOCKER_COMPOSE_DIR)/.env | sed -E 's/SSH_PASSPHRASE\s*=\s*//')"
+
+.PHONY: docker-init
+docker-init: $(DOCKER_COMPOSE_DIR)/.env $(DOCKER_COMPOSE_DIR)/workspace/.ssh/id_rsa ## Ensure the .env file exists and replace environment-specific variables.
 	mkdir -p $(DOCKER_COMPOSE_DIR)/db/data
 
 .PHONY: docker-build
