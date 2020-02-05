@@ -19,7 +19,7 @@ RUN /root/setup-scripts/install-software
 RUN /root/setup-scripts/install-php-extensions
 
 # Install additional utilities
-RUN apt-get update -qq && apt-get upgrade -yqq git htop vim unzip >/dev/null
+RUN apt-get update -qq && apt-get upgrade -yqq bash-completion git htop vim unzip >/dev/null
 
 # PHP and PHP-FPM configuration
 COPY .shared/config/php/conf.d/* /usr/local/etc/php/conf.d/
@@ -49,14 +49,19 @@ COPY workspace/node/default-packages /root/.nvm/
 COPY workspace/install-composer /tmp/install-composer
 RUN chmod u+x /tmp/install-composer && /tmp/install-composer
 
-# Activate bash completion feature, which is missing from the base image
-RUN apt-get update -qq && apt-get upgrade -yqq bash-completion >/dev/null
-RUN \
+# Install autocomplete
+RUN curl -s -o /usr/share/bash-completion/completions/composer \
+        https://raw.githubusercontent.com/sjorek/composer-bash-completion/master/composer-completion.bash
+
+USER www-data
+RUN curl -s -o ~/.composer-completion.php \
+        https://raw.githubusercontent.com/sjorek/composer-bash-completion/master/composer-completion.php && \
     ( \
         echo && \
-        echo '# Enable programmable completion features' && \
-        echo 'source /usr/share/bash-completion/bash_completion' \
-    ) >> ~/.bashrc
+        echo '# Autocomplete for composer' && \
+        echo 'export COMPOSER_COMPLETION_PHP_SCRIPT=~/.composer-completion.php' \
+    ) >> ~/.bash_profile
+USER root
 
 # Working directory
 WORKDIR /var/www/html

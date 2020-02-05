@@ -35,13 +35,3 @@ fi
 # Move the composer executable to a global bin directory
 mv composer.phar /usr/local/bin/composer
 
-# Install autocomplete
-URL_PREFIX="https://raw.githubusercontent.com/sjorek/composer-bash-completion/master/"
-curl -s "$URL_PREFIX"/composer-completion.php > ~/.composer-completion.php
-curl -s "$URL_PREFIX"/composer-completion.bash > /usr/share/bash-completion/completions/composer
-
-(
-    echo
-    echo '# composer autocomplete'
-    echo 'export COMPOSER_COMPLETION_PHP_SCRIPT=~/.composer-completion.php'
-) >> ~/.bashrc
