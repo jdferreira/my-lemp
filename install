@@ -26,5 +26,10 @@ else
     cp "$TMP/Makefile" "$TARGET"
 fi
 
+# Ensure the nginx default site points to the public directory
+if [ "$PUBLIC_DIR" != '.' ]; then
+    sed -i 's|root /var/www/html|root /var/www/html/'"$PUBLIC_DIR"'|' .docker/nginx/sites-available/default.conf
+fi
+
 # Create the .docker/.env file
 make docker-init
