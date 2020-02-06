@@ -47,7 +47,7 @@ COPY workspace/node/default-packages /root/.nvm/
 
 # Setup composer
 COPY workspace/install-composer /tmp/install-composer
-RUN chmod u+x /tmp/install-composer && /tmp/install-composer
+RUN chmod u+x /tmp/install-composer && /tmp/install-composer && rm /tmp/install-composer
 
 # Install autocomplete
 RUN curl -s -o /usr/share/bash-completion/completions/composer \
@@ -65,9 +65,6 @@ WORKDIR /var/www/html
 # Entry point
 COPY .shared/entrypoint/* /bin/docker-entrypoint/
 RUN chmod u+x /bin/docker-entrypoint/*
-
-# Cleanup
-RUN /root/setup-scripts/cleanup
 
 # Define how to start the container
 CMD [ "/usr/sbin/sshd", "-D"]
