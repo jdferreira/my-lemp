@@ -56,8 +56,9 @@ RUN curl -s -o /usr/share/bash-completion/completions/composer \
 USER www-data
 RUN curl -s -o ~/.composer-completion.php \
         https://raw.githubusercontent.com/sjorek/composer-bash-completion/master/composer-completion.php
-COPY workspace/.bash_profile ~/.bash_profile
 USER root
+COPY workspace/.bash_profile /home/www-data/.bash_profile
+RUN chown www-data:www-data /home/www-data/.bash_profile
 
 # Working directory
 WORKDIR /var/www/html
