@@ -40,10 +40,18 @@ RUN \
 USER root
 
 # Setup node
+USER www-data
 ARG NODE_VERSION=node
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/master/install.sh | bash
 RUN if [ "${NODE_VERSION}" != "node" ]; then . ~/.nvm/nvm.sh && nvm install ${NODE_VERSION}; fi
-COPY workspace/node/default-packages /root/.nvm/
+RUN ( \
+        echo '# Node, npm and nvm' && \
+        echo 'export NVM_DIR="$HOME/.nvm"' && \
+        echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm' && \
+        echo \
+    ) >> ~/.bash_profile
+USER root
+COPY --chown=www-data:www-data workspace/node/default-packages /home/www-data/.nvm/
 
 # Setup composer
 COPY workspace/install-composer /tmp/install-composer
@@ -56,12 +64,22 @@ RUN curl -s -o /usr/share/bash-completion/completions/composer \
 USER www-data
 RUN curl -s -o ~/.composer-completion.php \
         https://raw.githubusercontent.com/sjorek/composer-bash-completion/master/composer-completion.php
+RUN ( \
+        echo '# Autocomplete for composer' && \
+        echo 'export COMPOSER_COMPLETION_PHP_SCRIPT=~/.composer-completion.php' && \
+        echo \
+    ) >> ~/.bash_profile
 USER root
-COPY workspace/.bash_profile /home/www-data/.bash_profile
-RUN chown www-data:www-data /home/www-data/.bash_profile
 
 # Working directory
+USER www-data
 WORKDIR /var/www/html
+RUN ( \
+        echo '# Move to the relevant path' && \
+        echo 'cd /var/www/html' && \
+        echo \
+    ) >> ~/.bash_profile
+USER root
 
 # Entry point
 COPY .shared/entrypoint/* /bin/docker-entrypoint/
