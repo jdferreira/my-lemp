@@ -55,12 +55,8 @@ RUN curl -s -o /usr/share/bash-completion/completions/composer \
 
 USER www-data
 RUN curl -s -o ~/.composer-completion.php \
-        https://raw.githubusercontent.com/sjorek/composer-bash-completion/master/composer-completion.php && \
-    ( \
-        echo && \
-        echo '# Autocomplete for composer' && \
-        echo 'export COMPOSER_COMPLETION_PHP_SCRIPT=~/.composer-completion.php' \
-    ) >> ~/.bash_profile
+        https://raw.githubusercontent.com/sjorek/composer-bash-completion/master/composer-completion.php
+COPY workspace/.bash_profile ~/.bash_profile
 USER root
 
 # Working directory
