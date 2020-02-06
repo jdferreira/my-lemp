@@ -49,7 +49,7 @@ COPY workspace/node/default-packages /root/.nvm/
 COPY workspace/install-composer /tmp/install-composer
 RUN chmod u+x /tmp/install-composer && /tmp/install-composer && rm /tmp/install-composer
 
-# Install autocomplete
+# Install composer autocomplete
 RUN curl -s -o /usr/share/bash-completion/completions/composer \
         https://raw.githubusercontent.com/sjorek/composer-bash-completion/master/composer-completion.bash
 
@@ -69,6 +69,4 @@ RUN chmod u+x /bin/docker-entrypoint/*
 
 # Define how to start the container
 CMD [ "/usr/sbin/sshd", "-D"]
-ENTRYPOINT [ \
-    "/bin/docker-entrypoint/resolve-docker-host-ip" \
-]
+ENTRYPOINT [ "/bin/docker-entrypoint/resolve-docker-host-ip" ]
