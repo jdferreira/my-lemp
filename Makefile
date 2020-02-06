@@ -65,4 +65,5 @@ docker-down: docker-init ## Stop all docker containers.
 docker-clean: ## Remove the .env file and the local database volume.
 	$(DOCKER_COMPOSE) exec $(DB_CONTAINER) bash -c 'rm -rf /var/lib/mysql/*' || sudo rm -rf $(DOCKER_COMPOSE_DIR)/db/data
 	rm -f $(DOCKER_COMPOSE_DIR)/.env
+	rm -f $(DOCKER_COMPOSE_DIR)/workspace/.ssh/id_rsa{,.pub}
 	mkdir -p $(DOCKER_COMPOSE_DIR)/db/data
