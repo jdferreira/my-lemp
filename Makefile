@@ -53,6 +53,10 @@ docker-enter: ## Drop into a shell inside the container specified with CONTAINER
 	$(eval CONTAINER ?= $(WORKSPACE_CONTAINER))
 	$(DOCKER_COMPOSE) exec $(CONTAINER) bash
 
+.PHONY: docker-ps
+docker-ps: ## Show the running containers
+	$(DOCKER_COMPOSE) ps
+
 .PHONY: docker-logs
 docker-logs: docker-up ## Show the logs for the containers. You can define a FLAGS=<flags> variable to pass to the logs (such as -f, for example). You can also specify the container you are interested in with CONTAINER=<service>
 	$(DOCKER_COMPOSE) logs $(FLAGS) $(CONTAINER)
